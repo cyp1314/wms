@@ -84,7 +84,7 @@
 				cknavs: [
 					{
 						url: '/static/sys.png',
-						text: '出库',
+						text: '下架',
 						color: '#626C91',
 						path: '/pages/outbound/once',
 						icon: 'icon-a-ToBzhuangche3x'

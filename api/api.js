@@ -87,6 +87,24 @@ export function getCartParts(params) {
     params
   })
 }
+//捆包-1-获取台车上的数据
+export function getCartPartsForBundle(params) {
+  return request({
+    url: '/api/app/output/cartno/list',
+    method: 'get',
+    params
+  })
+}
+//捆包-2-将货物捆包到箱号里
+export function bundleParts(params) {
+  return request({
+    url: '/api/app/output/bundle',
+    method: 'get',
+    params
+  })
+}
+
+
 
 
 
