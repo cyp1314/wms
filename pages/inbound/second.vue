@@ -115,7 +115,6 @@
         cartParts: [], // 台车号上的货物信息
         selectedPart: null, // 选中的零件对象
         open: false,
-        currentScanType: ''
       };
     },
     computed: {
@@ -168,8 +167,8 @@
               const allReceived = this.cartParts.length == 0;
               if (allReceived) {
                 uni.showModal({
-                  title: '确认完成入库分拣？',
-                  content: '确认完成当前批次的入库分拣吗？',
+                  title: '提示',
+                  content: '当前批次的入库分拣已完成，未找到暂未验收的零件号？',
                   showCancel: false,
                   success: (res) => {
                     if (res.confirm) {
@@ -247,8 +246,6 @@
         // 打开扫码组件
         this.open = true;
         scanCode();
-        // 保存当前扫码类型
-        this.currentScanType = type;
       },
       // 处理外部扫码事件
       async handleScanEvent(code) {

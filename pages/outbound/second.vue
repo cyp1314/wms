@@ -116,7 +116,6 @@
 					{ title: '零件号' }
 				], // 步骤配置
 				open: false, // 扫码组件显示状态
-				currentScanType: null, // 当前扫描类型
 				cartParts: [], // 台车货物列表
 				currentItem: null // 当前选中的货物项
 			};
@@ -158,7 +157,6 @@
 			},
 			// 扫码
 			handleScan(type) {
-				this.currentScanType = type;
 				this.open = true;
 				// 调用扫码工具函数
 				scanCode();

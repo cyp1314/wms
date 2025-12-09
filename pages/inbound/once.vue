@@ -123,7 +123,6 @@
 				sortLogs: [],
 				inboundDetails: [], // 缓存入库列表
 				open: false,
-				currentScanType: ''
 			};
 		},
 		computed: {
@@ -193,48 +192,6 @@
 				// 打开扫码组件
 				this.open = true;
 				scanCode();
-				// 保存当前扫码类型
-				this.currentScanType = type;
-				// 注释掉模拟扫码代码
-				/*
-				// 模拟扫码结果
-				if (type === 'slip') {
-					// 调用接口获取入库详情
-					let scanResult = 'D25120400007';
-					this.dischargeno = scanResult;
-					this.fetchInboundDetails(scanResult);
-				} else if (type === 'ticket') {
-					// 模拟入库票扫描结果
-					let scanResult = 'W2512040000007';
-					this.inboundTicket = scanResult;
-					uni.showToast({
-						title: '入库票扫描成功',
-						icon: 'none'
-					});
-					// 3秒后自动进入下一步
-					setTimeout(() => {
-						this.currentStep = 2;
-					}, timer);
-				} else if (type === 'trace') {
-					this.traceCode = "583010R904";
-					// 验证零件号
-					this.validateTraceCode("583010R904");
-				} else if (type === 'cart') {
-					this.cartNo = 'CDA0C3';
-					// 需要提交
-					await this.submitCartNo();
-					// 刷新下列表
-					await this.fetchInboundDetails(this.dischargeno);
-					// 3秒后自动完成当前任务并重置状态
-					setTimeout(() => {
-						// 重置状态，继续下一个物品的处理
-						this.inboundTicket = '';
-						this.traceCode = '';
-						this.cartNo = '';
-						this.currentStep = 1;
-					}, timer);
-				}
-				*/
 			},
 			// 获取入库详情
 			async fetchInboundDetails(dischargeno) {
@@ -291,6 +248,7 @@
 								}, timer);
 							}
 						} else {
+							this.dischargeno = '';
 							this.inboundDetails = [];
 							uni.showToast({
 								title: '未获取到入库详情',
@@ -300,8 +258,10 @@
 					})
 					.catch(error => {
 						console.error('获取入库详情失败:', error);
+						this.dischargeno = '';
+						this.inboundDetails = [];
 						uni.showToast({
-							title: '获取入库详情失败',
+							title: '未获取到入库详情',
 							icon: 'none'
 						});
 					})

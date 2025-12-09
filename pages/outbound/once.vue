@@ -116,7 +116,6 @@
 					{ title: '台车号' }
 				], // 步骤配置
 				open: false, // 扫码组件显示状态
-				currentScanType: null, // 当前扫描类型
 				outboundDetails: [], // 出库明细列表
 				currentItem: null // 当前选中的出库明细项
 			};
@@ -157,7 +156,6 @@
 			},
 			// 扫码
 			handleScan(type) {
-				this.currentScanType = type;
 				this.open = true;
 				// 调用扫码工具函数
 				scanCode();
@@ -218,6 +216,7 @@
 							this.currentStep = 1;
 						}, timer);
 					} else {
+						this.saleno = '';
 						this.outboundDetails = [];
 						uni.showToast({
 							title: '未获取到出库明细',
