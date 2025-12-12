@@ -84,6 +84,12 @@
 			"navigationStyle": "custom"
 		}
 	}, {
+		"path": "pages/print",
+		"style": {
+			"navigationBarTitleText": "打印测试",
+			"navigationStyle": "custom"
+		}
+	}, {
 		"path": "pages/inbound/once",
 		"style": {
 			"navigationBarTitleText": "一次入库",

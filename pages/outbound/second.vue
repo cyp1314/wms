@@ -136,7 +136,7 @@
 		},
 		onUnload() {
 			// 移除扫码事件监听
-			uni.$off('scanCode', this.handleScanEvent);
+			uni.$off('scancodedate', this.handleScanEvent);
 			// 停止扫码
 			stopScanCode();
 		},
@@ -170,28 +170,28 @@
 					this.cartno = data;
 					uni.showToast({
 						title: '台车号扫描成功！',
-						icon: 'success'
+						icon: 'none'
 					});
 					this.handlePickScan('cartno');
 				} else if (this.currentStep === 1) {
 					this.boxno = data;
 					uni.showToast({
 						title: '箱号扫描成功！',
-						icon: 'success'
+						icon: 'none'
 					});
 					this.handlePickScan('boxno');
 				} else if (this.currentStep === 2) {
 					this.ticketno = data;
 					uni.showToast({
 						title: '出库票扫描成功！',
-						icon: 'success'
+						icon: 'none'
 					});
 					this.handlePickScan('ticketno');
 				} else if (this.currentStep === 3) {
 					this.partno = data;
 					uni.showToast({
 						title: '零件号扫描成功！',
-						icon: 'success'
+						icon: 'none'
 					});
 					this.handlePickScan('partno');
 				}
@@ -342,7 +342,7 @@
 					if (response.code === 200) {
 						uni.showToast({
 							title: '捆包成功！',
-							icon: 'success'
+							icon: 'none'
 						});
 						// 重新调用getCartPartsForBundle接口
 						const refreshResponse = await getCartPartsForBundle({ cartno: this.cartno });

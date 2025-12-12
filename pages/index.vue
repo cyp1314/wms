@@ -65,7 +65,7 @@
 			return {
 				// #96DEE8
 				isApp: false,
-				imgs: ['/static/images/lb1.png', '/static/images/lb2.png'],
+				imgs: ['/static/images/lb1.png', '/static/images/lb2.png', '/static/images/lb3.png'],
 				rknavs: [{
 
 					url: '/static/sys.png',
@@ -97,6 +97,13 @@
 					},
 				],
 				stnavs: [
+					{
+						url: '/static/sys.png',
+						text: '打印测试',
+						color: '#C4EBAD',
+						path: '/pages/print',
+						icon: 'icon-a-xitong3x'
+					},
 					{
 						url: '/static/sys.png',
 						text: '系统设置',

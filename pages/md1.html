@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>电子面单 Canvas 生成器 (100mm x 50mm)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Vue 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- JsBarcode (用于生成条形码) -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <!-- QRCode (用于生成二维码) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+  <style>
+    /* 自定义字体，尝试匹配面单常见字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@700&display=swap');
+
+    .font-serif-sc {
+      font-family: 'Noto Serif SC', 'SimSun', serif;
+    }
+
+    .font-sans-sc {
+      font-family: 'Noto Sans SC', 'SimHei', sans-serif;
+    }
+
+    /* 强制 Canvas 在屏幕上保持比例缩放，不影响内部真实分辨率 */
+    .canvas-container canvas {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-6">
+
+  <div id="app" class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <!-- 左侧：控制面板 -->
+    <div class="bg-white p-6 rounded-lg shadow-md space-y-6">
+      <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">📦 面单数据录入</h2>
+      <p class="text-sm text-gray-500">
+        目标尺寸: 100mm x 50mm <br>
+        输出分辨率: 800px x 400px (203 DPI)
+      </p>
+
+      <div class="space-y-4">
+        <!-- 抬头 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">抬头 (Top Text)</label>
+          <input type="text" v-model="form.header" @input="debouncedDraw"
+            class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+            placeholder="例如：乌鲁木齐龙腾">
+        </div>
+
+        <!-- 大头笔/分拣码 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">大头笔 (Sorting Code)</label>
+          <input type="text" v-model="form.sortingCode" @input="debouncedDraw"
+            class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+            placeholder="例如：62813 (1-)">
+        </div>
+
+        <!-- 地址 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">地址 (Address)</label>
+          <input type="text" v-model="form.address" @input="debouncedDraw"
+            class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+            placeholder="例如：乌鲁木齐市头屯河区...">
+        </div>
+
+        <!-- 运单号 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">运单号 (Tracking No)</label>
+          <div class="flex gap-2">
+            <input type="text" v-model="form.trackingNo" @input="debouncedDraw"
+              class="flex-1 border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+              placeholder="例如：L9I800241">
+            <button @click="generateRandomNo"
+              class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded text-sm transition">随机</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="pt-4 border-t flex gap-4">
+        <button @click="drawCanvas"
+          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition font-medium">
+          刷新预览
+        </button>
+        <button @click="exportBase64"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition font-medium flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          生成打印级 Base64
+        </button>
+      </div>
+
+      <!-- Base64 输出区域 -->
+      <div v-if="base64Result" class="mt-4 animate-fade-in">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Base64 结果 (已复制到剪贴板)</label>
+        <textarea readonly
+          class="w-full h-24 text-xs font-mono border border-gray-300 rounded p-2 bg-gray-50 resize-none"
+          :value="base64Result"></textarea>
+      </div>
+    </div>
+
+    <!-- 右侧：Canvas 预览 -->
+    <div class="bg-gray-200 p-6 rounded-lg shadow-inner flex flex-col items-center justify-center relative">
+      <h3 class="absolute top-4 left-6 text-sm font-bold text-gray-500 uppercase">Print Preview</h3>
+
+      <div class="canvas-container bg-white shadow-xl">
+        <!-- 
+                   Width: 800px (100mm @ 203 DPI)
+                   Height: 400px (50mm @ 203 DPI)
+                -->
+        <canvas ref="labelCanvas" width="800" height="400"></canvas>
+      </div>
+
+      <p class="mt-4 text-xs text-gray-500">Canvas 原始尺寸: 800px x 400px (用于 100mm x 50mm 打印)</p>
+    </div>
+
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted, reactive } = Vue;
+
+    createApp({
+      setup() {
+        const labelCanvas = ref(null);
+        const base64Result = ref('');
+        let ctx = null;
+        let debounceTimer = null;
+
+        // 表单数据
+        const form = reactive({
+          header: '乌鲁木齐龙腾',
+          sortingCode: '62813 (1-)',
+          address: '乌鲁木齐市头屯河区头屯河公路2345号',
+          trackingNo: 'L9I800241'
+        });
+
+        // 防抖重绘
+        const debouncedDraw = () => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            drawCanvas();
+          }, 300);
+        };
+
+        const generateRandomNo = () => {
+          form.trackingNo = 'L' + Math.floor(Math.random() * 1000000000);
+          drawCanvas();
+        };
+
+        // 核心绘制逻辑
+        const drawCanvas = async () => {
+          if (!labelCanvas.value) return;
+          ctx = labelCanvas.value.getContext('2d');
+          const width = labelCanvas.value.width;   // 800
+          const height = labelCanvas.value.height; // 400
+
+          // 1. 清空画布并填充白色背景
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, width, height);
+
+          // 2. 绘制 "抬头" 
+          ctx.fillStyle = '#000000';
+          ctx.textAlign = 'center';
+          // 字体放大: 24px -> 34px
+          ctx.font = 'bold 34px "SimSun", "Noto Serif SC", serif';
+          ctx.fillText(form.header, width / 2, 55);
+
+          // 3. 绘制 "大头笔/分拣码"
+          // 字体放大: 48px -> 68px
+          ctx.font = '68px "Times New Roman", "SimSun", serif';
+          ctx.fillText(form.sortingCode, width / 2, 135);
+
+          // 4. 绘制 "地址"
+          // 字体放大: 16px -> 24px
+          ctx.font = '24px "SimHei", "Noto Sans SC", sans-serif';
+          ctx.fillText(form.address, width / 2, 185);
+
+          // 5. 绘制 "运单号文字"
+          ctx.textAlign = 'left';
+          // 字体放大: 42px -> 60px
+          ctx.font = 'bold 60px "Arial", sans-serif';
+          // 坐标调整: x: 40->50, y: 190->270
+          ctx.fillText(form.trackingNo, 50, 270);
+
+          // 6. 生成并绘制条形码 (Code128)
+          try {
+            const tempCanvas = document.createElement('canvas');
+            JsBarcode(tempCanvas, form.trackingNo, {
+              format: "CODE128",
+              width: 4,        // 加宽: 3 -> 4
+              height: 80,      // 加高: 60 -> 80
+              displayValue: false,
+              margin: 0
+            });
+            // 坐标调整: y: 205 -> 290
+            ctx.drawImage(tempCanvas, 50, 290);
+          } catch (e) {
+            console.error("Barcode generation failed", e);
+          }
+
+          // 7. 生成并绘制二维码
+          try {
+            // 尺寸放大: width: 100 -> 140
+            const qrDataUrl = await QRCode.toDataURL(form.trackingNo, {
+              width: 140,
+              margin: 0,
+              errorCorrectionLevel: 'H'
+            });
+
+            const qrImage = new Image();
+            qrImage.onload = () => {
+              // 重新定位到右侧
+              // x: ~600, y: ~230
+              ctx.drawImage(qrImage, 600, 230, 140, 140);
+            };
+            qrImage.src = qrDataUrl;
+
+          } catch (e) {
+            console.error("QR generation failed", e);
+          }
+        };
+
+        const exportBase64 = () => {
+          if (!labelCanvas.value) return;
+          // 使用高质量 PNG
+          const dataUrl = labelCanvas.value.toDataURL('image/png', 1.0);
+          base64Result.value = dataUrl;
+
+          try {
+            const input = document.createElement('input');
+            input.setAttribute('value', dataUrl);
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            alert('已生成高分辨率 Base64 并复制到剪贴板！');
+          } catch (err) {
+            alert('Base64 已生成，请在下方文本框复制。');
+          }
+        };
+
+        onMounted(() => {
+          setTimeout(drawCanvas, 100);
+        });
+
+        return {
+          labelCanvas,
+          form,
+          base64Result,
+          debouncedDraw,
+          drawCanvas,
+          generateRandomNo,
+          exportBase64
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>

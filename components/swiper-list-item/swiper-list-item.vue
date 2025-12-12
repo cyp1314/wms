@@ -462,7 +462,8 @@
 							if (d <= 2000) {
 								// 在范围内
 								uni.showToast({
-									title: '在范围内'
+									title: '在范围内',
+									icon: 'none'
 								});
 							} else {
 								// 超出范围

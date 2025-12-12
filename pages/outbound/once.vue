@@ -135,7 +135,7 @@
 			stopScanCode();
 		},
 		onUnload() {
-			uni.$off('scanCode', this.handleScanEvent);
+			uni.$off('scancodedate', this.handleScanEvent);
 			// 停止扫码
 			stopScanCode();
 		},
@@ -169,28 +169,28 @@
 					this.saleno = data;
 					uni.showToast({
 						title: '发票号扫描成功！',
-						icon: 'success'
+						icon: 'none'
 					});
 					this.handlePickScan('saleno');
 				} else if (this.currentStep === 1) {
 					this.ticketno = data;
 					uni.showToast({
 						title: '出库票据扫描成功！',
-						icon: 'success'
+						icon: 'none'
 					});
 					this.handlePickScan('ticketno');
 				} else if (this.currentStep === 2) {
 					this.partno = data;
 					uni.showToast({
 						title: '零件号扫描成功！',
-						icon: 'success'
+						icon: 'none'
 					});
 					this.handlePickScan('partno');
 				} else if (this.currentStep === 3) {
 					this.cartNo = data;
 					uni.showToast({
 						title: '台车号扫描成功！',
-						icon: 'success'
+						icon: 'none'
 					});
 					this.handlePickScan('cartno');
 				}
@@ -224,6 +224,8 @@
 						});
 					}
 				} catch (error) {
+					this.saleno = '';
+					this.outboundDetails = [];
 					console.error('获取出库明细失败:', error);
 					uni.showToast({
 						title: '获取出库明细失败',
