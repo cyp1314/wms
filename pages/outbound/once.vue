@@ -263,7 +263,7 @@
 						item.isBlinking = true;
 						setTimeout(() => {
 							item.isBlinking = false;
-						}, 1000);
+						}, 3000);
 						// 3秒后自动进入下一步
 						setTimeout(() => {
 							this.currentStep = 2;

@@ -196,6 +196,7 @@
                 title: response.msg || '获取货物信息失败',
                 icon: 'none'
               });
+              this.cartNo = ''
             }
           })
       },
@@ -281,7 +282,7 @@
             // 3秒后停止闪烁
             setTimeout(() => {
               this.cartParts[index].isBlinking = false;
-            }, 1000);
+            }, 3000);
           }
           // 3秒后自动进入下一步
           setTimeout(() => {

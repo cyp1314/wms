@@ -278,7 +278,7 @@
 						item.isBlinking = true;
 						setTimeout(() => {
 							item.isBlinking = false;
-						}, 1000);
+						}, 3000);
 						// 进入下一步：扫描零件号
 						setTimeout(() => {
 							this.currentStep = 3;

@@ -6,30 +6,30 @@
 			</swiper-item>
 		</swiper>
 		<uni-section title="入库作业" type="line" padding>
-			<uni-grid :column="2" :highlight="true" @change="(e) => change(1, e)">
+			<uni-grid :column="4" :highlight="true" @change="(e) => change(1, e)">
 				<uni-grid-item v-for="(item, index) in rknavs" :index="index" :key="index">
 					<view class="grid-item-box" :style="{ backgroundColor: item.color }">
-						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="60"></uni-icons>
+						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="40"></uni-icons>
 						<text class="text">{{ item.text }}</text>
 					</view>
 				</uni-grid-item>
 			</uni-grid>
 		</uni-section>
 		<uni-section title="出库作业" type="line" padding>
-			<uni-grid :column="2" :highlight="true" @change="(e) => change(2, e)">
+			<uni-grid :column="4" :highlight="true" @change="(e) => change(2, e)">
 				<uni-grid-item v-for="(item, index) in cknavs" :index="index" :key="index">
 					<view class="grid-item-box" :style="{ backgroundColor: item.color }">
-						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="60"></uni-icons>
+						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="40"></uni-icons>
 						<text class="text">{{ item.text }}</text>
 					</view>
 				</uni-grid-item>
 			</uni-grid>
 		</uni-section>
 		<uni-section title="系统设置" type="line" padding>
-			<uni-grid :column="2" :highlight="true" @change="(e) => change(3, e)">
+			<uni-grid :column="4" :highlight="true" @change="(e) => change(3, e)">
 				<uni-grid-item v-for="(item, index) in stnavs" :index="index" :key="index">
 					<view class="grid-item-box" :style="{ backgroundColor: item.color }">
-						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="60"></uni-icons>
+						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="40"></uni-icons>
 						<text class="text">{{ item.text }}</text>
 					</view>
 				</uni-grid-item>
@@ -138,7 +138,7 @@
 		}
 	}
 </script>
-<style lang="scss">
+<style scoped lang="scss">
 	.app-header {
 		margin-top: 24px !important;
 	}
@@ -149,9 +149,10 @@
 	}
 
 	.text {
-		font-size: 24px;
+		font-size: 18px;
 		margin-top: 12px;
 		color: #FFF;
+		font-weight: bold;
 	}
 
 	.grid-item-box {
@@ -163,6 +164,10 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 15px 0;
+	}
+
+	::deep(.uni-grid) {
+		gap: 12px !important;
+		background-color: #F5F5F5 !important;
 	}
 </style>

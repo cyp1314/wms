@@ -280,6 +280,9 @@
 						title: '零件号不存在该批货物中',
 						icon: 'none'
 					});
+					setTimeout(() => {
+						this.traceCode = '';
+					}, timer);
 				} else {
 					// 为匹配的项添加闪烁效果
 					this.inboundDetails[index].isBlinking = true;
@@ -290,7 +293,7 @@
 					// 3秒后停止闪烁
 					setTimeout(() => {
 						this.inboundDetails[index].isBlinking = false;
-					}, 1000);
+					}, 3000);
 
 
 					// 3秒后自动进入下一步
