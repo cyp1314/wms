@@ -125,7 +125,6 @@
 		// flex: 1;
 		flex-direction: row;
 		flex-wrap: wrap;
-		gap: 12px;
 	}
 
 	.uni-grid--border {
