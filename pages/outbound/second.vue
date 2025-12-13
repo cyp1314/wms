@@ -23,6 +23,11 @@
 							{{ cartno || '点击扫描台车号' }}
 						</view>
 					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入台车号" v-model="manualCartno" />
+						<button class="manual-confirm-btn" @click="handleManualInput('cartno', manualCartno)">确认</button>
+					</view>
 				</view>
 
 				<!-- 箱号输入 -->
@@ -35,6 +40,11 @@
 						<view class="input" @click="handleScan('boxno')">
 							{{ boxno || '点击扫描箱号' }}
 						</view>
+					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入箱号" v-model="manualBoxno" />
+						<button class="manual-confirm-btn" @click="handleManualInput('boxno', manualBoxno)">确认</button>
 					</view>
 				</view>
 
@@ -49,6 +59,11 @@
 							{{ ticketno || '点击扫描出库票' }}
 						</view>
 					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入出库票" v-model="manualTicketno" />
+						<button class="manual-confirm-btn" @click="handleManualInput('ticketno', manualTicketno)">确认</button>
+					</view>
 				</view>
 
 				<!-- 零件号输入 -->
@@ -61,6 +76,11 @@
 						<view class="input" @click="handleScan('partno')">
 							{{ partno || '点击扫描零件号' }}
 						</view>
+					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入零件号" v-model="manualPartno" />
+						<button class="manual-confirm-btn" @click="handleManualInput('partno', manualPartno)">确认</button>
 					</view>
 				</view>
 			</view>
@@ -108,6 +128,11 @@
 				boxno: '', // 箱号
 				ticketno: '', // 出库票号
 				partno: '', // 零件号
+				// 手动输入字段
+				manualCartno: '',
+				manualBoxno: '',
+				manualTicketno: '',
+				manualPartno: '',
 				steps: ['台车号', '箱号', '出库票', '零件号'],
 				stepsOptions: [
 					{ title: '台车号' },
@@ -165,32 +190,51 @@
 			handleScanEvent(data) {
 				// 关闭扫码组件
 				this.open = false;
-
+				this.processInput(data);
+			},
+			// 手动输入处理
+			handleManualInput(type, value) {
+				if (!value) {
+					uni.showToast({
+						title: '请输入内容',
+						icon: 'none'
+					});
+					return;
+				}
+				this.processInput(value);
+				// 清空手动输入框
+				if (this.currentStep === 0) this.manualCartno = '';
+				else if (this.currentStep === 1) this.manualBoxno = '';
+				else if (this.currentStep === 2) this.manualTicketno = '';
+				else if (this.currentStep === 3) this.manualPartno = '';
+			},
+			// 统一处理输入（扫码或手动）
+			processInput(data) {
 				if (this.currentStep === 0) {
 					this.cartno = data;
 					uni.showToast({
-						title: '台车号扫描成功！',
+						title: '台车号输入成功！',
 						icon: 'none'
 					});
 					this.handlePickScan('cartno');
 				} else if (this.currentStep === 1) {
 					this.boxno = data;
 					uni.showToast({
-						title: '箱号扫描成功！',
+						title: '箱号输入成功！',
 						icon: 'none'
 					});
 					this.handlePickScan('boxno');
 				} else if (this.currentStep === 2) {
 					this.ticketno = data;
 					uni.showToast({
-						title: '出库票扫描成功！',
+						title: '出库票输入成功！',
 						icon: 'none'
 					});
 					this.handlePickScan('ticketno');
 				} else if (this.currentStep === 3) {
 					this.partno = data;
 					uni.showToast({
-						title: '零件号扫描成功！',
+						title: '零件号输入成功！',
 						icon: 'none'
 					});
 					this.handlePickScan('partno');
@@ -452,15 +496,44 @@
 	}
 
 	.input {
-		flex: 1;
-		height: 44px;
-		line-height: 44px;
-		padding: 0 12px;
-		font-size: 16px;
-		color: #333333;
-		border: none;
-		outline: none;
-	}
+				flex: 1;
+				height: 44px;
+				line-height: 44px;
+				padding: 0 12px;
+				font-size: 16px;
+				color: #333333;
+				border: none;
+				outline: none;
+			}
+			
+			/* 手动输入样式 */
+			.manual-input {
+				display: flex;
+				margin-top: 10px;
+				gap: 10px;
+			}
+			
+			.manual-input-field {
+				flex: 1;
+				height: 44px;
+				padding: 0 12px;
+				font-size: 16px;
+				color: #333333;
+				border: 1px solid #e5e5e5;
+				border-radius: 8px;
+				outline: none;
+			}
+			
+			.manual-confirm-btn {
+				height: 44px;
+				padding: 0 20px;
+				font-size: 16px;
+				color: #ffffff;
+				background-color: #FF9500;
+				border: none;
+				border-radius: 8px;
+				outline: none;
+			}
 
 	/* 日志卡片样式 */
 	.logs-card {

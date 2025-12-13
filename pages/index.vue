@@ -6,7 +6,7 @@
 			</swiper-item>
 		</swiper>
 		<uni-section title="入库作业" type="line" padding>
-			<uni-grid :column="4" :highlight="true" @change="(e) => change(1, e)">
+			<uni-grid :column="3" :highlight="true" @change="(e) => change(1, e)">
 				<uni-grid-item v-for="(item, index) in rknavs" :index="index" :key="index">
 					<view class="grid-item-box" :style="{ backgroundColor: item.color }">
 						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="40"></uni-icons>
@@ -16,7 +16,7 @@
 			</uni-grid>
 		</uni-section>
 		<uni-section title="出库作业" type="line" padding>
-			<uni-grid :column="4" :highlight="true" @change="(e) => change(2, e)">
+			<uni-grid :column="3" :highlight="true" @change="(e) => change(2, e)">
 				<uni-grid-item v-for="(item, index) in cknavs" :index="index" :key="index">
 					<view class="grid-item-box" :style="{ backgroundColor: item.color }">
 						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="40"></uni-icons>
@@ -26,7 +26,7 @@
 			</uni-grid>
 		</uni-section>
 		<uni-section title="系统设置" type="line" padding>
-			<uni-grid :column="4" :highlight="true" @change="(e) => change(3, e)">
+			<uni-grid :column="3" :highlight="true" @change="(e) => change(3, e)">
 				<uni-grid-item v-for="(item, index) in stnavs" :index="index" :key="index">
 					<view class="grid-item-box" :style="{ backgroundColor: item.color }">
 						<uni-icons color="#FFF" custom-prefix="iconfont" :type="item.icon" size="40"></uni-icons>

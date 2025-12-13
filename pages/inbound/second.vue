@@ -27,6 +27,11 @@
               {{ cartNo || '点击扫描台车号' }}
             </view>
           </view>
+          <!-- 手动输入 -->
+          <view class="manual-input">
+            <input type="text" class="manual-input-field" placeholder="手动输入台车号" v-model="manualCartNo" />
+            <button class="manual-confirm-btn" @click="handleManualInput('cart', manualCartNo)">确认</button>
+          </view>
         </view>
 
         <!-- 入库票扫描 -->
@@ -39,6 +44,11 @@
             <view class="input" @click="handleScan('ticket')">
               {{ inboundTicket || '点击扫描入库票' }}
             </view>
+          </view>
+          <!-- 手动输入 -->
+          <view class="manual-input">
+            <input type="text" class="manual-input-field" placeholder="手动输入入库票" v-model="manualInboundTicket" />
+            <button class="manual-confirm-btn" @click="handleManualInput('ticket', manualInboundTicket)">确认</button>
           </view>
         </view>
 
@@ -53,6 +63,11 @@
               {{ partNo || '点击扫描零件号' }}
             </view>
           </view>
+          <!-- 手动输入 -->
+          <view class="manual-input">
+            <input type="text" class="manual-input-field" placeholder="手动输入零件号" v-model="manualPartNo" />
+            <button class="manual-confirm-btn" @click="handleManualInput('part', manualPartNo)">确认</button>
+          </view>
         </view>
 
         <!-- 库位号扫描 -->
@@ -65,6 +80,11 @@
             <view class="input" @click="handleScan('location')">
               {{ location || '点击扫描库位号' }}
             </view>
+          </view>
+          <!-- 手动输入 -->
+          <view class="manual-input">
+            <input type="text" class="manual-input-field" placeholder="手动输入库位号" v-model="manualLocation" />
+            <button class="manual-confirm-btn" @click="handleManualInput('location', manualLocation)">确认</button>
           </view>
         </view>
       </view>
@@ -79,6 +99,10 @@
               <view class="log-slip">零件名称：{{ item.partname }}</view>
               <view class="log-cart">零件编号：{{ item.partno }}</view>
             </view>
+			<view style="border: 1px solid #007AFF;margin: 4px 0;"></view>
+			<view style="display: flex;flex-direction: row;justify-content: space-between;margin: 0 12px;">
+				<view class="log-time">验收数量:{{ item.grndataqty }}</view>
+			</view>
           </view>
         </view>
       </view>
@@ -112,6 +136,11 @@
         inboundTicket: '',
         partNo: '',
         location: '',
+        // 手动输入字段
+        manualCartNo: '',
+        manualInboundTicket: '',
+        manualPartNo: '',
+        manualLocation: '',
         cartParts: [], // 台车号上的货物信息
         selectedPart: null, // 选中的零件对象
         open: false,
@@ -252,7 +281,26 @@
       async handleScanEvent(code) {
         // 关闭扫码组件
         this.open = false;
-
+        this.processInput(code);
+      },
+      // 手动输入处理
+      handleManualInput(type, value) {
+        if (!value) {
+          uni.showToast({
+            title: '请输入内容',
+            icon: 'none'
+          });
+          return;
+        }
+        this.processInput(value);
+        // 清空手动输入框
+        if (this.currentStep === 0) this.manualCartNo = '';
+        else if (this.currentStep === 1) this.manualInboundTicket = '';
+        else if (this.currentStep === 2) this.manualPartNo = '';
+        else if (this.currentStep === 3) this.manualLocation = '';
+      },
+      // 统一处理输入（扫码或手动）
+      async processInput(code) {
         if (this.currentStep === 0) {
           this.cartNo = code;
           // 获取台车号上的货物信息
@@ -302,7 +350,7 @@
         }
 
         uni.showToast({
-          title: '扫码成功',
+          title: this.currentStep === 0 ? '台车号输入成功' : this.currentStep === 1 ? '入库票输入成功' : this.currentStep === 2 ? '零件号输入成功' : '库位号输入成功',
           icon: 'none'
         });
       }
@@ -387,6 +435,35 @@
     font-size: 16px;
     color: #333333;
     border: none;
+    outline: none;
+  }
+  
+  /* 手动输入样式 */
+  .manual-input {
+    display: flex;
+    margin-top: 10px;
+    gap: 10px;
+  }
+  
+  .manual-input-field {
+    flex: 1;
+    height: 44px;
+    padding: 0 12px;
+    font-size: 16px;
+    color: #333333;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    outline: none;
+  }
+  
+  .manual-confirm-btn {
+    height: 44px;
+    padding: 0 20px;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: #007AFF;
+    border: none;
+    border-radius: 8px;
     outline: none;
   }
 

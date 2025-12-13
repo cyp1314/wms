@@ -26,6 +26,11 @@
 							{{ dischargeno || '点击扫描入库单号' }}
 						</view>
 					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入入库单号" v-model="manualDischargeno" />
+						<button class="manual-confirm-btn" @click="handleManualInput('slip', manualDischargeno)">确认</button>
+					</view>
 				</view>
 
 				<!-- 入库票输入 -->
@@ -38,6 +43,11 @@
 						<view class="input" @click="handleScan('ticket')">
 							{{ inboundTicket || '点击扫描入库票' }}
 						</view>
+					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入入库票" v-model="manualInboundTicket" />
+						<button class="manual-confirm-btn" @click="handleManualInput('ticket', manualInboundTicket)">确认</button>
 					</view>
 				</view>
 
@@ -52,6 +62,11 @@
 							{{ traceCode || '点击扫描零件号' }}
 						</view>
 					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入零件号" v-model="manualTraceCode" />
+						<button class="manual-confirm-btn" @click="handleManualInput('trace', manualTraceCode)">确认</button>
+					</view>
 				</view>
 
 				<!-- 台车号输入 -->
@@ -64,6 +79,11 @@
 						<view class="input" @click="handleScan('cart')">
 							{{ cartNo || '点击扫描台车号' }}
 						</view>
+					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入台车号" v-model="manualCartNo" />
+						<button class="manual-confirm-btn" @click="handleManualInput('cart', manualCartNo)">确认</button>
 					</view>
 				</view>
 
@@ -120,6 +140,11 @@
 				inboundTicket: '',
 				traceCode: '',
 				cartNo: '',
+				// 手动输入字段
+				manualDischargeno: '',
+				manualInboundTicket: '',
+				manualTraceCode: '',
+				manualCartNo: '',
 				sortLogs: [],
 				inboundDetails: [], // 缓存入库列表
 				open: false,
@@ -306,7 +331,26 @@
 			async handleScanEvent(code) {
 				// 关闭扫码组件
 				this.open = false;
-
+				this.processInput(code);
+			},
+			// 手动输入处理
+			handleManualInput(type, value) {
+				if (!value) {
+					uni.showToast({
+						title: '请输入内容',
+						icon: 'none'
+					});
+					return;
+				}
+				this.processInput(value);
+				// 清空手动输入框
+				if (this.currentStep === 0) this.manualDischargeno = '';
+				else if (this.currentStep === 1) this.manualInboundTicket = '';
+				else if (this.currentStep === 2) this.manualTraceCode = '';
+				else if (this.currentStep === 3) this.manualCartNo = '';
+			},
+			// 统一处理输入（扫码或手动）
+			async processInput(code) {
 				if (this.currentStep === 0) {
 					this.dischargeno = code;
 					// 调用接口获取入库详情
@@ -342,7 +386,7 @@
 				}
 
 				uni.showToast({
-					title: '扫码成功',
+					title: this.currentStep === 0 ? '入库单号输入成功' : this.currentStep === 1 ? '入库票输入成功' : this.currentStep === 2 ? '零件号输入成功' : '台车号输入成功',
 					icon: 'none'
 				});
 			},
@@ -415,15 +459,44 @@
 	}
 
 	.input {
-		flex: 1;
-		height: 44px;
-		line-height: 44px;
-		padding: 0 12px;
-		font-size: 16px;
-		color: #333333;
-		border: none;
-		outline: none;
-	}
+				flex: 1;
+				height: 44px;
+				line-height: 44px;
+				padding: 0 12px;
+				font-size: 16px;
+				color: #333333;
+				border: none;
+				outline: none;
+			}
+			
+			/* 手动输入样式 */
+			.manual-input {
+				display: flex;
+				margin-top: 10px;
+				gap: 10px;
+			}
+			
+			.manual-input-field {
+				flex: 1;
+				height: 44px;
+				padding: 0 12px;
+				font-size: 16px;
+				color: #333333;
+				border: 1px solid #e5e5e5;
+				border-radius: 8px;
+				outline: none;
+			}
+			
+			.manual-confirm-btn {
+				height: 44px;
+				padding: 0 20px;
+				font-size: 16px;
+				color: #ffffff;
+				background-color: #007AFF;
+				border: none;
+				border-radius: 8px;
+				outline: none;
+			}
 
 
 

@@ -23,6 +23,11 @@
 							{{ saleno || '点击扫描发票号' }}
 						</view>
 					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入发票号" v-model="manualSaleno" />
+						<button class="manual-confirm-btn" @click="handleManualInput('saleno', manualSaleno)">确认</button>
+					</view>
 				</view>
 
 				<!-- 出库票据输入 -->
@@ -36,10 +41,15 @@
 							{{ ticketno || '点击扫描出库票据' }}
 						</view>
 					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入出库票据" v-model="manualTicketno" />
+						<button class="manual-confirm-btn" @click="handleManualInput('ticketno', manualTicketno)">确认</button>
+					</view>
 				</view>
 
-				<!-- 零件号输入 -->
-				<view v-if="currentStep === 2" class="input-group">
+				<!-- 零件号输入（已注释） -->
+				<!-- <view v-if="currentStep === 2" class="input-group">
 					<view class="input-label">零件号</view>
 					<view class="input-wrapper">
 						<view class="input-icon">
@@ -49,10 +59,15 @@
 							{{ partno || '点击扫描零件号' }}
 						</view>
 					</view>
-				</view>
+					<!-- 手动输入
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入零件号" v-model="manualPartno" />
+						<button class="manual-confirm-btn" @click="handleManualInput('partno', manualPartno)">确认</button>
+					</view>
+				</view> -->
 
 				<!-- 台车号输入 -->
-				<view v-if="currentStep === 3" class="input-group">
+				<view v-if="currentStep === 2" class="input-group">
 					<view class="input-label">台车号</view>
 					<view class="input-wrapper">
 						<view class="input-icon">
@@ -62,29 +77,36 @@
 							{{ cartNo || '点击扫描台车号' }}
 						</view>
 					</view>
+					<!-- 手动输入 -->
+					<view class="manual-input">
+						<input type="text" class="manual-input-field" placeholder="手动输入台车号" v-model="manualCartNo" />
+						<button class="manual-confirm-btn" @click="handleManualInput('cartno', manualCartNo)">确认</button>
+					</view>
 				</view>
 			</view>
 
 			<!-- 出库明细列表 -->
-			<view class="logs-card" v-if="outboundDetails.length > 0">
-				<view class="logs-title">出库明细列表</view>
-				<view class="logs-list">
-					<view class="log-item" v-for="item in outboundDetails" :key="item.ticketno"
-						:class="{ 'blink-border': item.isBlinking }">
-						<view style="display: flex;flex-direction: column;">
-							<view class="log-content">
-								<view class="log-slip">零件名称：{{ item.partname }}</view>
-								<view class="log-cart">零件编号：{{ item.partno }}</view>
-							</view>
-							<view style="border: 1px solid #FF9500;margin: 4px 0;"></view>
-							<view style="display: flex;flex-direction: row;justify-content: space-between;margin: 0 12px;">
-								<view class="log-time">出库数量:{{ item.invqty }}</view>
-								<view class="log-time log_ys">出库票号：{{ item.ticketno }}</view>
+				<view class="logs-card" v-if="outboundDetails.length > 0">
+					<view class="logs-title">出库明细列表</view>
+					<view class="logs-list">
+						<view class="log-item" v-for="item in outboundDetails" :key="item.ticketno"
+							:class="{ 'blink-border': item.isBlinking }">
+							<view style="display: flex;flex-direction: column;">
+								<view class="log-content">
+									<view class="log-slip">零件名称：{{ item.partname }}</view>
+									<view class="log-cart">零件编号：{{ item.partno }}</view>
+								</view>
+								<view style="border: 1px solid #FF9500;margin: 4px 0;"></view>
+								<view style="display: flex;flex-direction: row;justify-content: space-between;margin: 0 12px;">
+									<view class="log-time">出库数量:{{ item.invqty }}</view>
+									<view class="log-time log_ys">出库票号：{{ item.ticketno }}</view>
+									<!-- 已出库标签 -->
+									<view v-if="item.ticketno === ticketno" class="outbound-tag">已扫描</view>
+								</view>
 							</view>
 						</view>
 					</view>
 				</view>
-			</view>
 		</view>
 		<!-- 扫码组件 -->
 		<pdaScanVue v-if="open"></pdaScanVue>
@@ -108,12 +130,16 @@
 				ticketno: '', // 出库票据
 				partno: '', // 零件号
 				cartNo: '', // 台车号
-				steps: ['发票号', '出库票据', '零件号', '台车号'],
-				stepsOptions: [
-					{ title: '发票号' },
-					{ title: '出库票据' },
-					{ title: '零件号' },
-					{ title: '台车号' }
+				// 手动输入字段
+				manualSaleno: '',
+				manualTicketno: '',
+				manualPartno: '',
+				manualCartNo: '',
+				steps: ['发票号', '出库票据', '台车号'],
+			stepsOptions: [
+				{ title: '发票号' },
+				{ title: '出库票据' },
+				{ title: '台车号' }
 				], // 步骤配置
 				open: false, // 扫码组件显示状态
 				outboundDetails: [], // 出库明细列表
@@ -144,8 +170,7 @@
 				const titles = [
 					'第一步：扫描发票号',
 					'第二步：扫描出库票据',
-					'第三步：确认零件号',
-					'第四步：扫描台车号'
+					'第三步：扫描台车号'
 				];
 				return titles[this.currentStep];
 			}
@@ -164,32 +189,44 @@
 			handleScanEvent(data) {
 				// 关闭扫码组件
 				this.open = false;
-
+				this.processInput(data);
+			},
+			// 手动输入处理
+			handleManualInput(type, value) {
+				if (!value) {
+					uni.showToast({
+						title: '请输入内容',
+						icon: 'none'
+					});
+					return;
+				}
+				this.processInput(value);
+				// 清空手动输入框
+				if (this.currentStep === 0) this.manualSaleno = '';
+				else if (this.currentStep === 1) this.manualTicketno = '';
+				else if (this.currentStep === 2) this.manualPartno = '';
+				else if (this.currentStep === 3) this.manualCartNo = '';
+			},
+			// 统一处理输入（扫码或手动）
+			processInput(data) {
 				if (this.currentStep === 0) {
 					this.saleno = data;
 					uni.showToast({
-						title: '发票号扫描成功！',
+						title: '发票号输入成功！',
 						icon: 'none'
 					});
 					this.handlePickScan('saleno');
 				} else if (this.currentStep === 1) {
 					this.ticketno = data;
 					uni.showToast({
-						title: '出库票据扫描成功！',
+						title: '出库票据输入成功！',
 						icon: 'none'
 					});
 					this.handlePickScan('ticketno');
 				} else if (this.currentStep === 2) {
-					this.partno = data;
-					uni.showToast({
-						title: '零件号扫描成功！',
-						icon: 'none'
-					});
-					this.handlePickScan('partno');
-				} else if (this.currentStep === 3) {
 					this.cartNo = data;
 					uni.showToast({
-						title: '台车号扫描成功！',
+						title: '台车号输入成功！',
 						icon: 'none'
 					});
 					this.handlePickScan('cartno');
@@ -206,7 +243,7 @@
 						this.outboundDetails = response.data.map(item => ({
 							...item,
 							isBlinking: false
-						}));
+						})).filter(item => item.status !='1' && item.status !='2');
 						uni.showToast({
 							title: '获取出库明细成功',
 							icon: 'none'
@@ -255,7 +292,7 @@
 						});
 						return;
 					}
-					// 根据ticketno查找对应的出库明细
+					// 判断本次扫码到的出库票号是否在列表中
 					const item = this.outboundDetails.find(item => item.ticketno === this.ticketno);
 					if (item) {
 						this.currentItem = item;
@@ -264,10 +301,28 @@
 						setTimeout(() => {
 							item.isBlinking = false;
 						}, 3000);
-						// 3秒后自动进入下一步
-						setTimeout(() => {
-							this.currentStep = 2;
-						}, timer);
+						
+						// 检查item的invqty是否大于1，显示确认框
+						if (item.invqty > 1) {
+							uni.showModal({
+								title: '出库提示',
+								content: `该出库单的零件号数量为${item.invqty}`,
+								showCancel: false,
+								success: (res) => {
+									if (res.confirm) {
+										// 3秒后自动进入下一步
+										setTimeout(() => {
+											this.currentStep = 2;
+										}, timer);
+									}
+								}
+							});
+						} else {
+							// 3秒后自动进入下一步
+							setTimeout(() => {
+								this.currentStep = 2;
+							}, timer);
+						}
 					} else {
 						uni.showToast({
 							title: '未找到对应的出库票据',
@@ -275,7 +330,7 @@
 						});
 						this.ticketno = ''
 					}
-				} else if (type === 'partno') {
+				} /*else if (type === 'partno') {
 					if (!this.partno) {
 						uni.showToast({
 							title: '请扫描零件号',
@@ -296,7 +351,7 @@
 						});
 						this.partno = ''
 					}
-				} else if (type === 'cartno') {
+				}*/ else if (type === 'cartno') {
 					if (!this.cartNo) {
 						uni.showToast({
 							title: '请扫描台车号',
@@ -305,24 +360,8 @@
 						return;
 					}
 
-					// 检查item的invqty是否大于1
-					if (this.currentItem && this.currentItem.invqty > 1) {
-						// 显示弹窗
-						uni.showModal({
-							title: '出库提示',
-							content: `该出库单的零件号数量为${this.currentItem.invqty}`,
-							showCancel: false,
-							success: (res) => {
-								if (res.confirm) {
-									// 调用scanOutbound接口
-									this.scanOutbound();
-								}
-							}
-						});
-					} else {
-						// 直接调用scanOutbound接口
-						this.scanOutbound();
-					}
+					// 直接调用scanOutbound接口
+					this.scanOutbound();
 				}
 			},
 			// 调用扫描出库接口
@@ -333,7 +372,7 @@
 				try {
 					const response = await scanOutbound({
 						ticketno: this.ticketno,
-						partno: this.partno,
+						partno: this.currentItem.partno, // 使用当前选中项的partno
 						cartno: this.cartNo,
 						qty: this.currentItem.invqty
 					});
@@ -346,19 +385,20 @@
 						const refreshResponse = await getOutboundDetails({ saleno: this.saleno });
 						this.outboundDetails = refreshResponse.data.map(item => ({
 							...item,
-							isBlinking: false
-						})).filter(item => item.status == '0');
-						if (this.outboundDetails.length > 0) {
+							isBlinking: false,
+							// 添加出库状态标记，1表示已出库
+							outboundStatus: item.status === '0' ? '0' : '1'
+						}));
+						if (this.outboundDetails.length > 0 && this.outboundDetails.some(item => item.status === '0')) {
 							// 重置当前步骤，继续下一个出库任务
 							setTimeout(() => {
 								this.ticketno = '';
-								this.partno = '';
 								this.cartNo = '';
 								this.currentItem = null;
 								this.currentStep = 1;
 							}, 1500);
 						} else {
-							// 数据长度为0，回到第一步
+							// 数据长度为0或所有任务已完成，回到第一步
 							this.outboundDetails = [];
 							uni.showToast({
 								title: '本次出库任务已完成',
@@ -367,7 +407,6 @@
 							setTimeout(() => {
 								this.saleno = '';
 								this.ticketno = '';
-								this.partno = '';
 								this.cartNo = '';
 								this.currentItem = null;
 								this.currentStep = 0;
@@ -450,15 +489,44 @@
 	}
 
 	.input {
-		flex: 1;
-		height: 44px;
-		line-height: 44px;
-		padding: 0 12px;
-		font-size: 16px;
-		color: #333333;
-		border: none;
-		outline: none;
-	}
+				flex: 1;
+				height: 44px;
+				line-height: 44px;
+				padding: 0 12px;
+				font-size: 16px;
+				color: #333333;
+				border: none;
+				outline: none;
+			}
+			
+			/* 手动输入样式 */
+			.manual-input {
+				display: flex;
+				margin-top: 10px;
+				gap: 10px;
+			}
+			
+			.manual-input-field {
+				flex: 1;
+				height: 44px;
+				padding: 0 12px;
+				font-size: 16px;
+				color: #333333;
+				border: 1px solid #e5e5e5;
+				border-radius: 8px;
+				outline: none;
+			}
+			
+			.manual-confirm-btn {
+				height: 44px;
+				padding: 0 20px;
+				font-size: 16px;
+				color: #ffffff;
+				background-color: #FF9500;
+				border: none;
+				border-radius: 8px;
+				outline: none;
+			}
 
 	/* 当前拣货信息 */
 	.current-pick {
@@ -625,5 +693,16 @@
 
 	.log_ys {
 		color: darkgreen;
+	}
+	
+	/* 已出库标签样式 */
+	.outbound-tag {
+		background-color: #4CAF50;
+		color: white;
+		font-size: 12px;
+		border-radius: 4px;
+		margin-left: 8px;
+		line-height: 34px;
+		text-align: center;
 	}
 </style>
