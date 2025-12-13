@@ -9,11 +9,11 @@
 					:style="{width:leftIconWidth}">
 					<slot name="left">
 						<view class="uni-navbar__content_view" v-if="leftIcon.length > 0">
-							<uni-icons :color="themeColor" :type="leftIcon" size="20" />
+							<uni-icons :color="themeColor" :type="leftIcon" size="24" />
 						</view>
 						<view :class="{ 'uni-navbar-btn-icon-left': !leftIcon.length > 0 }" class="uni-navbar-btn-text"
 							v-if="leftText.length">
-							<text :style="{ color: themeColor, fontSize: '12px' }">{{ leftText }}</text>
+							<text :style="{ color: themeColor, fontSize: '16px', fontWeight: 'bold' }">{{ leftText }}</text>
 						</view>
 					</slot>
 				</view>
@@ -211,10 +211,12 @@
 
 	.uni-nav-bar-text {
 		/* #ifdef APP-PLUS */
-		font-size: 34rpx;
+		font-size: 38rpx;
+		font-weight: bold;
 		/* #endif */
 		/* #ifndef APP-PLUS */
-		font-size: 14px;
+		font-size: 16px;
+		font-weight: bold;
 		/* #endif */
 	}
 

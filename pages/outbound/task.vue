@@ -1,6 +1,6 @@
 <template>
   <view class="outbound-tasks" :class="{ 'app-header': isApp }">
-    <uni-nav-bar title="出库任务" left-text="返回" left-icon="left" @clickLeft="navigateBack"></uni-nav-bar>
+    <uni-nav-bar title="出库任务" left-text="返回" left-icon="left" @clickLeft="navigateBack" color="#007AFF"></uni-nav-bar>
 
     <!-- 扫码输入框 -->
     <view class="scan-section">

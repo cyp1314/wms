@@ -1,6 +1,6 @@
 <template>
 	<view class="details-container" :class="{ 'app-header': isApp }">
-		<uni-nav-bar :title="dischargeno" left-text="返回" left-icon="left" @clickLeft="navigateBack"></uni-nav-bar>
+		<uni-nav-bar :title="dischargeno" left-text="返回" left-icon="left" @clickLeft="navigateBack" color="#007AFF"></uni-nav-bar>
 
 		<!-- 台车号显示区域 -->
 		<view v-if="carNumber" class="car-number-section">

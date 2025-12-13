@@ -1,6 +1,6 @@
 <template>
 	<view class="details-container" :class="{ 'app-header': isApp }">
-		<uni-nav-bar :title="invguid" left-text="返回" left-icon="left" @clickLeft="navigateBack"></uni-nav-bar>
+		<uni-nav-bar :title="invguid" left-text="返回" left-icon="left" @clickLeft="navigateBack" color="#007AFF"></uni-nav-bar>
 
 		<!-- 有数据时显示content-wrapper -->
 		<view v-if="productList && productList.length > 0" class="content-wrapper">

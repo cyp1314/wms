@@ -1,9 +1,9 @@
 <template>
 	<view class="second-outbound" :class="{ 'app-header': isApp }">
-		<uni-nav-bar title="二次出库（捆包）" left-text="返回" left-icon="left" @clickLeft="navigateBack"></uni-nav-bar>
+		<uni-nav-bar title="二次出库（捆包）" left-text="返回" left-icon="left" @clickLeft="navigateBack" color="#007AFF"></uni-nav-bar>
 		<!-- 步骤指示器 -->
 		<view style="background-color: #FFF;margin: 10px 0 0 0;padding: 10px;">
-			<uni-steps :options="stepsOptions" :active="currentStep" active-color="#FF9500"></uni-steps>
+			<uni-steps :options="stepsOptions" :active="currentStep" active-color="#007AFF"></uni-steps>
 		</view>
 		<!-- 页面内容区 -->
 		<view class="content">
@@ -96,7 +96,7 @@
 								<view class="log-slip">零件名称：{{ item.partname }}</view>
 								<view class="log-cart">零件编号：{{ item.partno }}</view>
 							</view>
-							<view style="border: 1px solid #FF9500;margin: 4px 0;"></view>
+							<view style="border: 1px solid #007AFF;margin: 4px 0;"></view>
 							<view style="display: flex;flex-direction: row;justify-content: space-between;margin: 0 12px;">
 								<view class="log-time">出库数量:{{ item.invqty }}</view>
 								<view class="log-time log_ys">出库票号：{{ item.ticketno }}</view>
@@ -527,9 +527,10 @@
 			.manual-confirm-btn {
 				height: 44px;
 				padding: 0 20px;
-				font-size: 16px;
+				font-size: 18px;
+				font-weight: bold;
 				color: #ffffff;
-				background-color: #FF9500;
+				background-color: #007AFF;
 				border: none;
 				border-radius: 8px;
 				outline: none;
@@ -594,8 +595,8 @@
 	}
 
 	.log-item:hover {
-		border-color: #FF9500;
-		box-shadow: 0 4px 12px rgba(255, 149, 0, 0.15);
+		border-color: #007AFF;
+		box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
 		transform: translateY(-2px);
 	}
 
@@ -644,7 +645,7 @@
 	/* 闪烁边框动画 */
 	@keyframes blink {
 		0% {
-			border-color: #FF9500;
+			border-color: #007AFF;
 		}
 
 		50% {
@@ -652,7 +653,7 @@
 		}
 
 		100% {
-			border-color: #FF9500;
+			border-color: #007AFF;
 		}
 	}
 

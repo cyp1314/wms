@@ -1,6 +1,6 @@
 <template>
 	<view class="once-inbound" :class="{ 'app-header': isApp }">
-		<uni-nav-bar title="入库分拣" left-text="返回" left-icon="left" @clickLeft="navigateBack">
+		<uni-nav-bar title="入库分拣" left-text="返回" left-icon="left" @clickLeft="navigateBack" color="#007AFF">
 
 		</uni-nav-bar>
 		<!-- 步骤指示器 -->
@@ -490,7 +490,8 @@
 			.manual-confirm-btn {
 				height: 44px;
 				padding: 0 20px;
-				font-size: 16px;
+				font-size: 18px;
+				font-weight: bold;
 				color: #ffffff;
 				background-color: #007AFF;
 				border: none;
@@ -513,7 +514,7 @@
 		color: #ffffff;
 		border: none;
 		border-radius: 8px;
-		font-size: 16px;
+		font-size: 18px;
 		font-weight: bold;
 	}
 

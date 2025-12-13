@@ -1,6 +1,6 @@
 <template>
   <view class="second-inbound" :class="{ 'app-header': isApp }">
-    <uni-nav-bar title="入库上架" left-text="返回" left-icon="left" @clickLeft="navigateBack">
+    <uni-nav-bar title="入库上架" left-text="返回" left-icon="left" @clickLeft="navigateBack" color="#007AFF">
       <!-- <view class="status" slot="right">进行中</view> -->
     </uni-nav-bar>
     <!-- 步骤指示器 -->
@@ -459,7 +459,8 @@
   .manual-confirm-btn {
     height: 44px;
     padding: 0 20px;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: bold;
     color: #ffffff;
     background-color: #007AFF;
     border: none;
